@@ -5,13 +5,13 @@ from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from wtforms import SubmitField, DateField
 from flask_bootstrap import Bootstrap
-from config import SECRET_KEY
+from config import SECRET_KEY, SECRET
 
 
 URL = "https://api.robolabs.lt"
 invoice_list_endpoint = "/api/get_invoice_list"
 headers = {
-    "x-api-key": "SECRET"
+    "x-api-key": SECRET
 }
 # defaults for date selectors
 today = dt.datetime.now()
