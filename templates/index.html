@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+{% import "bootstrap/wtf.html." as wtf %}
+<head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css" integrity="sha256-3sPp8BkKUE7QyPSl6VfBByBroQbKxKG7tsusY2mhbVY=" crossorigin="anonymous" />
+    <meta charset="UTF-8">
+    <title>Invoice Tracker</title>
+</head>
+<body>
+<div class="container">
+            <div class="row">
+                 <div class="col-lg-10 mx-auto mb-4 text-center">
+                    <div class="section-title text-center">
+                        <h3 class="top-c-sep">Credit control</h3>
+                        <p>Filter issued invoices and track their status.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10 mx-auto mb-4">
+                    <div class="invoice-search align-items-center">
+                        <p> Choose period by invoice date:</p>
+
+{{ wtf.quick_form(form, form_type="inline", horizontal_columns=('lg', 3, 3), button_map={"submit":"info"}) }}
+
+</div>
+</div>
+                </div>
+                 <div class="row">
+                 <div class="col-lg-10 mx-auto mb-4 text-center">
+                     {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+         <div class="alert alert-info" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+                </div>
+            </div>
+
+                        <div class="filter-result">
+
+{% if invoices %}
+                            <p class="mb-30 ff-montserrat">Total Invoices in Period: {{ inv_count }}</p>
+                            <div class="job-box align-items-center ">
+
+                                <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Inv. No.</th>
+      <th scope="col">Partner Name</th>
+      <th scope="col">Invoice Date</th>
+      <th scope="col">Amount</th>
+        <th scope="col">Due</th>
+        <th scope="col">Status</th>
+        <th scope="col">Type</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for invoice in invoices %}
+    <tr>
+      <th scope="row">{{ invoice.invoice_number }}</th>
+      <td>{{ invoice.partner_name }}</td>
+      <td>{{ invoice.date_invoice }}</td>
+      <td>{{ invoice.amount_total_invoice_currency }} {{ invoice.currency }}</td>
+        <td>{{ invoice.date_due }}</td>
+        <td>{{ invoice.state }}</td>
+        <td>{{ invoice.type }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+</div>
+
+                        </div>
+                        {% endif %}
+                    </div>
+
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min.js"></script>
+<script>
+
+</script>
+</html>
