@@ -59,11 +59,17 @@ def index():
                     flash(f"{data['error']['message']}")
                 else:
                     chosen_invoices = data["result"]["data"]
-                    chosen_invoices.sort(key=lambda x: x["date_invoice"])
-                    total_inv_count = len(chosen_invoices)
+                    # add year-month field for grouping
+                    invoices_group = []
+                    for inv in chosen_invoices:
+                        date = dt.datetime.strptime(inv["date_invoice"], "%Y-%m-%d")
+                        inv["month_invoice"] = date.strftime("%Y-%m")
+                        invoices_group.append(inv)
+                    invoices_group.sort(key=lambda x: x["date_invoice"])
+                    total_inv_count = len(invoices_group)
                     if total_inv_count == 0:
                         flash(f"{data['result']['error']}")
-                    return render_template("index.html", form=form, invoices=chosen_invoices,
+                    return render_template("index.html", form=form, invoices=invoices_group,
                                            inv_count=total_inv_count)
     return render_template("index.html", form=form)
 
