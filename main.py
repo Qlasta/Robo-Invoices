@@ -3,7 +3,7 @@ import datetime as dt
 from flask import Flask, redirect, url_for, request, render_template, flash
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
-from wtforms import SubmitField, DateField
+from wtforms import SubmitField, DateField, StringField
 from flask_bootstrap import Bootstrap
 from config import SECRET_KEY, SECRET
 
@@ -34,18 +34,20 @@ app.config['SECRET_KEY'] = SECRET_KEY
 Bootstrap(app)
 
 
-class DateSelector(FlaskForm):
+class FilterSelector(FlaskForm):
     date_from = DateField(label="Date From", validators=[DataRequired()], format="%Y-%m-%d", default=last_month_start)
     date_to = DateField(label="Date To", validators=[DataRequired()], format="%Y-%m-%d", default=last_month_end)
+    status = StringField(label="Status", default="")
     submit = SubmitField(label='Submit')
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    form = DateSelector()
+    form = FilterSelector()
     if request.method == "POST":
         selected_from = form.date_from.data
         selected_to = form.date_to.data
+        status_filter = form.status.data
         if selected_from > selected_to:
             flash('"Date From" is later than "Date To". Please select valid period.')
         else:
@@ -59,20 +61,25 @@ def index():
                     flash(f"{data['error']['message']}")
                 else:
                     chosen_invoices = data["result"]["data"]
-                    # add year-month field for grouping
+                    unique_statuses = list(set([inv['state'] for inv in chosen_invoices]))
                     invoices_group = []
                     for inv in chosen_invoices:
+                        # add year-month field for grouping
                         date = dt.datetime.strptime(inv["date_invoice"], "%Y-%m-%d")
                         inv["month_invoice"] = date.strftime("%Y-%m")
-                        invoices_group.append(inv)
+                        # filter by status if chosen
+                        if status_filter != "":
+                            if inv["state"] == status_filter:
+                                invoices_group.append(inv)
+                        else:
+                            invoices_group.append(inv)
                     invoices_group.sort(key=lambda x: x["date_invoice"])
                     total_inv_count = len(invoices_group)
                     if total_inv_count == 0:
                         flash(f"{data['result']['error']}")
                     return render_template("index.html", form=form, invoices=invoices_group,
-                                           inv_count=total_inv_count)
+                                           inv_count=total_inv_count, statuses=unique_statuses)
     return render_template("index.html", form=form)
-
 
 if __name__ == "__main__":
     app.run(debug=True)

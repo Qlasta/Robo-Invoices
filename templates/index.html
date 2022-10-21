@@ -19,20 +19,37 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-10 mx-auto mb-4">
+        <div class="container">
           <div class="invoice-search align-items-center">
-            <p> Choose period by invoice date:</p>
-            {{ wtf.quick_form(form, form_type="inline", horizontal_columns=('lg', 3, 3), button_map={"submit":"info"}) }}
+            <form class="form form-inline" method="POST" action="{{ url_for('index') }}">
+              <label style="margin:auto 30px auto 0;"> Period by invoice date:</label>
+              {{ form.date_from(class_="form-control",size=20) }}
+              {{ form.date_to(class_="form-control",size=5) }}
+              <input class="btn btn-info" id="submit" type="submit" value="Submit">
+                {% if statuses %}
+                <label class="aditional_filters" style="margin:auto 30px auto auto;"> Status filters:</label>
+                {% for state in statuses %}
+                <input class="btn btn-outline-secondary float-right" type="submit" name="status" value="{{state}}">
+                {% endfor %}
+                {% endif %}
+            </form>
           </div>
-<!--            <div>
-                <button type="button" class="btn btn-secondary">Group by month</button>
-            </div>-->
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-10 mx-auto mb-4 text-center"> {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %} <div class="alert alert-info" role="alert">{{ message }}</div> {% endfor %} {% endif %} {% endwith %} </div>
+        <div class="col-lg-10 mx-auto mb-4 text-center">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% endfor %} {% endif %} {% endwith %}
+        </div>
       </div>
-      <div class="filter-result"> {% if invoices %} <p class="mb-30 ff-montserrat">Total invoices in period: {{ inv_count }}</p>
+      <div class="filter-result">
+          {% if invoices %}
+          <p class="mb-30 ff-montserrat">Total invoices in period: {{ inv_count }}</p>
+        <div class="container">
+        </div>
         <div class="job-box align-items-center ">
           <table class="table">
             <thead>
@@ -47,14 +64,11 @@
               </tr>
             </thead>
             <tbody>
-            <tr>
-{% for month, month_group in invoices|groupby('month_invoice') %}
-
-                <th scope="row" colspan="7"><h4>---------- {{ month }} ----------</h4></th>
-
-
-    </tr>
-            {% for invoice in month_group %} <tr>
+              <tr> {% for month, month_group in invoices|groupby('month_invoice') %}
+                  <th scope="row" colspan="7">
+                  <h4>---------- {{ month }} ----------</h4>
+                </th>
+              </tr> {% for invoice in month_group %} <tr>
                 <th scope="row">{{ invoice.invoice_number }}</th>
                 <td>{{ invoice.partner_name }}</td>
                 <td>{{ invoice.date_invoice }}</td>
@@ -62,14 +76,12 @@
                 <td>{{ invoice.date_due }}</td>
                 <td>{{ invoice.state }}</td>
                 <td>{{ invoice.type }}</td>
-              </tr> {% endfor %} </tbody>
-              {% endfor %}
+              </tr> {% endfor %}
+            </tbody> {% endfor %}
           </table>
-        </div>
-          {% endif %}
+        </div> {% endif %}
       </div>
     </div>
-
   </body>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min.js"></script>
